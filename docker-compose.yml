@@ -1,0 +1,58 @@
+version: "3.9"
+# #NETWORK
+networks:
+    my-network:
+      driver: bridge
+:
+services:
+    db:
+        container_name: postgres_db
+        image: postgres
+        volumes:
+            - ./data/db:/app/db/postgresql/data
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+    backend:
+        container_name: backend_django
+        build: 
+            dockerfile: Dockerfile
+            context: ./backend
+        hostname: django
+        restart: always
+        command: ["python","manage.py","runserver","0.0.0.0:8000"]
+        volumes:
+            - ./backend:/app/backend
+        networks: 
+            - my-network
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+    frontend:
+        container_name: prontend_node
+        build: 
+            dockerfile: Dockerfile
+            context: ./frontend
+        #restart: always
+        networks:
+            - my-network
+        volumes:
+            - ./frontend:/app/frontend
+            - /app/frontend/node_modules
+        ports:
+            - "3000:3000"
+        command: ["npm", "start"]
+    pytorch:
+        container_name: nlp_pytorch
+        build: 
+            dockerfile: Dockerfile
+            context: ./pytorch
+        # restart: always
+        networks: 
+            - my-network
+        volumes:
+            - ./pytorch:/app/pytorch
+        command: python pytorch.py
+    
