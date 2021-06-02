@@ -1,9 +1,6 @@
 version: "3.9"
-# #NETWORK
-networks:
-    my-network:
-      driver: bridge
-:
+
+
 services:
     db:
         container_name: postgres_db
@@ -24,8 +21,7 @@ services:
         command: ["python","manage.py","runserver","0.0.0.0:8000"]
         volumes:
             - ./backend:/app/backend
-        networks: 
-            - my-network
+        
         ports:
             - "8000:8000"
         depends_on:
@@ -36,8 +32,7 @@ services:
             dockerfile: Dockerfile
             context: ./frontend
         #restart: always
-        networks:
-            - my-network
+        
         volumes:
             - ./frontend:/app/frontend
             - /app/frontend/node_modules
@@ -50,8 +45,7 @@ services:
             dockerfile: Dockerfile
             context: ./pytorch
         # restart: always
-        networks: 
-            - my-network
+        
         volumes:
             - ./pytorch:/app/pytorch
         command: python pytorch.py
